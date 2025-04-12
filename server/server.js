@@ -31,7 +31,7 @@ const Message = mongoose.model('Message', messageSchema);
 // Serve static frontend
 app.use(express.static(path.join(__dirname, '../public')));
 
-// Fallback for SPA routes
+// Fallback route for SPA
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, '../public/index.html'));
 });
@@ -40,12 +40,12 @@ app.get('*', (req, res) => {
 io.on('connection', (socket) => {
   console.log('User connected:', socket.id);
 
-  // Load old messages
+  // Send chat history
   Message.find().sort({ timestamp: 1 }).limit(50).then(messages => {
     socket.emit('chat history', messages);
   });
 
-  // Listen for messages
+  // Receive message
   socket.on('chat message', (data) => {
     const newMessage = new Message({
       username: data.username,
