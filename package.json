@@ -1,17 +1,39 @@
 {
-  "name": "chat-server",
+  "name": "chat-app",
   "version": "1.0.0",
-  "main": "server.js",
+  "description": "Real-time chat app with Socket.io and MongoDB",
+  "main": "server/server.js",
   "scripts": {
-    "start": "node server.js"
-  },
-  "engines": {
-    "node": ">=16.20.1"
+    "start": "node server/server.js",
+    "build": "echo 'No build step required for server-side app'",
+    "dev": "nodemon server/server.js"
   },
   "dependencies": {
-    "cors": "^2.8.5",
-    "express": "^4.18.2",
-    "mongoose": "^7.6.1",
-    "socket.io": "^4.7.2"
-  }
+    "express": "^4.18.1",
+    "mongoose": "^6.5.4",
+    "socket.io": "^4.4.0"
+  },
+  "engines": {
+    "node": "16.x"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.15"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/yourusername/yourrepository.git"
+  },
+  "keywords": [
+    "chat",
+    "realtime",
+    "socket.io",
+    "mongodb",
+    "node"
+  ],
+  "author": "Your Name",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/yourusername/yourrepository/issues"
+  },
+  "homepage": "https://github.com/yourusername/yourrepository#readme"
 }
