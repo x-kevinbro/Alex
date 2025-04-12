@@ -1,21 +1,26 @@
 const express = require('express');
 const http = require('http');
-const socketIo = require('socket.io');
+const socketIO = require('socket.io');
 const mongoose = require('mongoose');
+const cors = require('cors');
+const path = require('path');
 
-// Initialize app and server
 const app = express();
 const server = http.createServer(app);
-const io = socketIo(server);
+const io = socketIO(server);
 
-// MongoDB connection URI
-const dbURI = 'mongodb+srv://Mralexid:Alex123@cluster0.sgp6phr.mongodb.net/';
+// Middleware
+app.use(cors());
+app.use(express.json());
 
-mongoose.connect(dbURI, { useNewUrlParser: true, useUnifiedTopology: true })
-  .then(() => console.log("Connected to MongoDB"))
-  .catch(err => console.log("Error connecting to MongoDB:", err));
+// MongoDB connect
+mongoose.connect('mongodb+srv://Mralexid:Alex123@cluster0.sgp6phr.mongodb.net/', {
+  useNewUrlParser: true,
+  useUnifiedTopology: true
+}).then(() => console.log('MongoDB connected'))
+  .catch(err => console.error('MongoDB connection error:', err));
 
-// Message Schema for MongoDB
+// Chat schema
 const messageSchema = new mongoose.Schema({
   username: String,
   message: String,
@@ -23,35 +28,42 @@ const messageSchema = new mongoose.Schema({
 });
 const Message = mongoose.model('Message', messageSchema);
 
-// Serve static files from 'public' folder
-app.use(express.static('public'));
+// Serve static frontend
+app.use(express.static(path.join(__dirname, '../public')));
 
-// Socket.IO connection
+// Fallback for SPA routes
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, '../public/index.html'));
+});
+
+// Socket.IO
 io.on('connection', (socket) => {
-  console.log('A user connected');
+  console.log('User connected:', socket.id);
 
-  // Listen for chat messages and save them to MongoDB
-  socket.on('chat message', (msg) => {
-    const newMessage = new Message({
-      username: msg.username,
-      message: msg.message
-    });
-
-    newMessage.save()
-      .then(() => {
-        io.emit('chat message', msg); // Broadcast message to all users
-      })
-      .catch(err => console.log("Error saving message:", err));
+  // Load old messages
+  Message.find().sort({ timestamp: 1 }).limit(50).then(messages => {
+    socket.emit('chat history', messages);
   });
 
-  // Handle user disconnecting
+  // Listen for messages
+  socket.on('chat message', (data) => {
+    const newMessage = new Message({
+      username: data.username,
+      message: data.message
+    });
+
+    newMessage.save().then(() => {
+      io.emit('chat message', newMessage); // Broadcast to all clients
+    });
+  });
+
   socket.on('disconnect', () => {
-    console.log('User disconnected');
+    console.log('User disconnected:', socket.id);
   });
 });
 
-// Start the server
-const port = process.env.PORT || 3000;
-server.listen(port, () => {
-  console.log(`Server is running on port ${port}`);
+// Start server
+const PORT = process.env.PORT || 3000;
+server.listen(PORT, () => {
+  console.log(Server running on port ${PORT});
 });
