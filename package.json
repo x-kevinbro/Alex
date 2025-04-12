@@ -1,19 +1,18 @@
 {
-  "name": "chat-app",
+  "name": "chat-server",
   "version": "1.0.0",
-  "description": "Real-time chat application with Socket.IO and MongoDB",
-  "main": "server/server.js",
+  "description": "Real-time chat server using Socket.IO",
+  "main": "server.js",
   "scripts": {
-    "start": "node server/server.js"
+    "start": "node server.js"
   },
   "dependencies": {
-    "express": "^4.17.1",
-    "mongoose": "^5.12.3",
-    "socket.io": "^4.5.1"
+    "express": "^4.18.2",
+    "mongoose": "^7.5.0",
+    "socket.io": "^4.7.2",
+    "cors": "^2.8.5"
   },
   "engines": {
-    "node": "14.x"
-  },
-  "author": "",
-  "license": "ISC"
+    "node": ">=16.20.1"
+  }
 }
